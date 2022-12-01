@@ -39,13 +39,17 @@ public class Gamble {
             currentDayStake = playTillMaxStake();
             day++;
             stake = 100;
-            if (currentDayStake == MAX_STAKE) {
-                int wonStake = currentDayStake-stake;
-                System.out.println("You won at day " + day + " $" + wonStake);
-            } else {
-                int lostStake = stake-currentDayStake;
-                System.out.println("You lost at day " + day + " $" + lostStake);
-            }
+            dailyWinLoss(day, currentDayStake);
+        }
+    }
+
+    private void dailyWinLoss(int day, int currentDayStake) {
+        if (currentDayStake == MAX_STAKE) {
+            int wonStake = currentDayStake - stake;
+            System.out.println("You won at day " + day + " $" + wonStake);
+        } else {
+            int lostStake = stake - currentDayStake;
+            System.out.println("You lost at day " + day + " $" + lostStake);
         }
     }
 }
