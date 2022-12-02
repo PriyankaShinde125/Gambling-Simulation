@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 public class Gamble {
     public static final int WIN_BET = 1;
@@ -13,9 +11,11 @@ public class Gamble {
     int bet;
     int monthlyWonDays = 0;
     int monthlyLostDays = 0;
-    int totalWonAmount = 0;
-    int totalLostAmount = 0;
+    int totalWonLostAmount = 0;
+    int luckiestDay;
+    int unLuckiestDay;
     HashMap<String, ArrayList<Integer>> daysWonLost;
+    HashMap<Integer, Integer> dayAndAmountWon;
 
     public Gamble() {
         stake = 100;
@@ -25,6 +25,7 @@ public class Gamble {
         daysWonLost = new HashMap<>();
         daysWonLost.put(DAYS_WON_KEY, new ArrayList<>());
         daysWonLost.put(DAYS_LOST_KEY, new ArrayList<>());
+        dayAndAmountWon = new HashMap<>();
     }
 
     public void makeABet() {
@@ -51,14 +52,38 @@ public class Gamble {
             stake = 100;
             dailyWinLoss(day, currentDayStake);
         }
-        System.out.println("Total won days in month = " + monthlyWonDays + " these are as follows : ");
-        System.out.println(daysWonLost.get("Won"));
-        System.out.println("Total lost days in month = " + monthlyLostDays + " these are as follows :");
-        System.out.println(daysWonLost.get("Lost"));
-        int wonByAmount = totalWonAmount - totalLostAmount;
-        if (wonByAmount > 0)
-            System.out.println("You won by amount = " + wonByAmount);
-        else
+        printMonthResult();
+    }
+
+    private void printMonthResult() {
+        System.out.println("Total won days in month = " + monthlyWonDays + "\nWon days are as follows : ");
+        System.out.println(daysWonLost.get(DAYS_WON_KEY));
+        System.out.println("Total lost days in month = " + monthlyLostDays + "\nLost days are as follows :");
+        System.out.println(daysWonLost.get(DAYS_LOST_KEY));
+
+        if (totalWonLostAmount > 0) {
+            System.out.println("You won by amount = " + totalWonLostAmount);
+            luckiestDay = 1;
+            unLuckiestDay = 1;
+            int maxWon = dayAndAmountWon.get(1);
+            int maxLost = maxWon;
+
+            for (Map.Entry<Integer, Integer> entry : dayAndAmountWon.entrySet()) {
+                if (entry.getValue() > maxWon) {
+                    maxWon = entry.getValue();
+                    luckiestDay = entry.getKey();
+                }
+                if (entry.getValue() < maxLost) {
+                    maxLost = entry.getValue();
+                    unLuckiestDay = entry.getKey();
+                }
+                System.out.println(entry.getKey() +" -> "+ entry.getValue());
+            }
+
+            System.out.println("Luckiest day = "+luckiestDay);
+            System.out.println("Unluckiest day = "+unLuckiestDay);
+
+        } else
             System.out.println("Ooh.... you lost all amount");
     }
 
@@ -67,11 +92,13 @@ public class Gamble {
         if (currentDayStake == MAX_STAKE) {
             daysWonLost.get(DAYS_WON_KEY).add(day);
             monthlyWonDays++;
-            totalWonAmount += wonOrLostStake;
+            totalWonLostAmount += wonOrLostStake;
+            dayAndAmountWon.put(day, totalWonLostAmount);
         } else {
             daysWonLost.get(DAYS_LOST_KEY).add(day);
             monthlyLostDays++;
-            totalLostAmount += wonOrLostStake;
+            totalWonLostAmount -= wonOrLostStake;
+            dayAndAmountWon.put(day, totalWonLostAmount);
         }
     }
 }
